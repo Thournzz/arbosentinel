@@ -1,0 +1,29 @@
+# Maven
+target/
+*.class
+*.jar
+*.war
+
+# IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Secrets — NEVER commit these
+application-local.properties
+application.properties
+
+# Keep the prod properties (no secrets in it — all env vars)
+!application-prod.properties
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Data files — too large, download separately
+*.csv
