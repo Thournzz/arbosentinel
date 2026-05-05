@@ -5,7 +5,6 @@ import com.arbosentinel.green.dto.MlPredictionResponse;
 import com.arbosentinel.red.MlService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,9 +17,8 @@ public class MlController {
     private final MlService mlService;
 
     // Predict dengue cases for a city + week with climate inputs
-    // Protected — requires authentication to trigger ML runs
+    // Public access — research demo platform, not clinical production
     @PostMapping("/run/dengue")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<MlPredictionResponse>> predictDengue(
             @RequestParam String city,
             @RequestParam Integer weekOfYear,
