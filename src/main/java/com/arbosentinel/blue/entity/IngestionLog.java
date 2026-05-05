@@ -9,6 +9,8 @@ package com.arbosentinel.blue.entity;
 import com.arbosentinel.blue.entity.enums.IngestionStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import java.time.LocalDateTime;
 
 @Entity
@@ -38,6 +40,7 @@ public class IngestionLog {
     private Integer rowsFailed;
 
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(name = "status", nullable = false, columnDefinition = "ingestion_status")
     private IngestionStatus status;
 

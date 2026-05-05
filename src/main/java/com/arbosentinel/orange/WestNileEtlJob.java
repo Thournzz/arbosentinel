@@ -65,8 +65,14 @@ public class WestNileEtlJob {
         var dataSource = dataSourceRepo.findBySourceName("CDC West Nile Virus Data");
         if (dataSource.isPresent()) {
             var lastRun = ingestionLogRepo.findTopByDataSourceIdOrderByRunAtDesc(dataSource.get().getId());
-            if (lastRun.isPresent() && lastRun.get().getStatus() == IngestionStatus.success) {
-                log.info("West Nile ETL: already loaded, skipping");
+            // Only skip if prior run was successful AND actually inserted rows
+            // (guards against false-success logs written when BOM caused 0 inserts)
+            if (lastRun.isPresent()
+                    && lastRun.get().getStatus() == IngestionStatus.success
+                    && lastRun.get().getRowsInserted() != null
+                    && lastRun.get().getRowsInserted() > 0) {
+                log.info("West Nile ETL: already loaded ({} rows), skipping",
+                    lastRun.get().getRowsInserted());
                 return;
             }
         }
@@ -93,7 +99,7 @@ public class WestNileEtlJob {
                     if (year == null || annualRepo.findByYear(year).isPresent()) continue;
                     annualRepo.save(WestNileAnnualCase.builder()
                         .year(year)
-                        .reportedCases(parseIntRequired(firstNonNull(row, "Cases", "cases", "Total_Cases", "reported_cases")))
+                        .reportedCases(parseIntRequired(firstNonNull(row, "Cases", "cases", "Total_Cases", "reported_cases", "Reported Cases")))
                         .dataSourceId(sourceId)
                         .build());
                     inserted++;
@@ -123,7 +129,7 @@ public class WestNileEtlJob {
                     hospRepo.save(WestNileHospitalization.builder()
                         .year(year)
                         .neuroinvasiveCases(parseInt(firstNonNull(row, "Neuroinvasive", "neuroinvasive_cases")))
-                        .nonNeuroinvasiveCases(parseInt(firstNonNull(row, "Non-Neuroinvasive", "non_neuroinvasive_cases")))
+                        .nonNeuroinvasiveCases(parseInt(firstNonNull(row, "Non-Neuroinvasive", "non_neuroinvasive_cases", "Non_neuroinvasive", "Non_Neuroinvasive")))
                         .dataSourceId(sourceId)
                         .build());
                     inserted++;
@@ -146,15 +152,16 @@ public class WestNileEtlJob {
                     new FileReader(Paths.get(dataDir, stateFile).toFile()))) {
                 Map<String, String> row;
                 while ((row = reader.readMap()) != null) {
-                    String caseType = firstNonNull(row, "Case_Type", "case_type", "CaseType");
-                    String yearRange = firstNonNull(row, "Year_Range", "year_range", "YearRange");
-                    String state    = firstNonNull(row, "State", "state", "State_Code", "state_code");
+                    // CDC export uses: Type, Year (as range string), Location (state code), Reported Cases
+                    String caseType = firstNonNull(row, "Case_Type", "case_type", "CaseType", "Type");
+                    String yearRange = firstNonNull(row, "Year_Range", "year_range", "YearRange", "Year");
+                    String state    = firstNonNull(row, "State", "state", "State_Code", "state_code", "Location");
                     if (state != null && state.length() > 2) state = state.substring(0, 2);
                     stateRepo.save(WestNileStateCase.builder()
                         .caseType(caseType != null ? caseType : "Unknown")
                         .yearRange(yearRange != null ? yearRange : "Unknown")
                         .stateCode(state != null ? state : "XX")
-                        .reportedCases(parseInt(firstNonNull(row, "Cases", "cases", "reported_cases")))
+                        .reportedCases(parseInt(firstNonNull(row, "Cases", "cases", "reported_cases", "Reported Cases")))
                         .dataSourceId(sourceId)
                         .build());
                     inserted++;
@@ -179,9 +186,9 @@ public class WestNileEtlJob {
                 while ((row = reader.readMap()) != null) {
                     monthlyRepo.save(WestNileMonthlyCase.builder()
                         .caseType(firstNonNull(row, "Case_Type", "case_type", "CaseType", "Type"))
-                        .yearRange(firstNonNull(row, "Year_Range", "year_range", "YearRange"))
+                        .yearRange(firstNonNull(row, "Year_Range", "year_range", "YearRange", "Year"))
                         .month(firstNonNull(row, "Month", "month"))
-                        .reportedCases(parseInt(firstNonNull(row, "Cases", "cases")))
+                        .reportedCases(parseInt(firstNonNull(row, "Cases", "cases", "Reported Cases")))
                         .dataSourceId(sourceId)
                         .build());
                     inserted++;
@@ -205,7 +212,7 @@ public class WestNileEtlJob {
                 Map<String, String> row;
                 while ((row = reader.readMap()) != null) {
                     demographicRepo.save(WestNileDemographic.builder()
-                        .ageGroup(firstNonNull(row, "Age_Group", "age_group", "AgeGroup"))
+                        .ageGroup(firstNonNull(row, "Age_Group", "age_group", "AgeGroup", "Age"))
                         .maleRate(parseBig(firstNonNull(row, "Male_Rate", "male_rate", "Male")))
                         .femaleRate(parseBig(firstNonNull(row, "Female_Rate", "female_rate", "Female")))
                         .dataSourceId(sourceId)
