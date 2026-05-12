@@ -14,6 +14,7 @@ import com.arbosentinel.green.dto.MlPredictionResponse;
 import com.arbosentinel.green.mapper.AlertMapper;
 import com.arbosentinel.purple.MlPredictionRepository;
 import com.arbosentinel.white.MlServiceException;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -55,7 +56,7 @@ public class MlService {
         Integer predictedCases,
         Double riskScore,
         Double confidencePct,
-        String modelVersion
+        @JsonProperty("model") String modelVersion   // FastAPI sends "model" not "modelVersion"
     ) {}
 
     // ── Prediction request (sync — called from controller) ───────

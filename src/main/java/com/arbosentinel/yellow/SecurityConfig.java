@@ -58,7 +58,7 @@ public class SecurityConfig {
                     "/api/dashboard/**",
                     "/api/ml/predictions/**"
                 ).permitAll()
-                // ── ML prediction — public (research demo, not clinical) ──
+                // ── ML prediction + risk scores — public (research demo) ──
                 .requestMatchers(HttpMethod.POST, "/api/ml/run/dengue").permitAll()
                 // ── Health check — public ────────────────────────────────
                 .requestMatchers("/actuator/health", "/actuator/info").permitAll()
