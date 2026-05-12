@@ -92,7 +92,10 @@ public class DashboardService {
         long total = locationTotals.stream()
             .mapToLong(r -> r[1] != null ? ((Number) r[1]).longValue() : 0L)
             .sum();
-        return new DashboardStatsResponse.DiseaseTotalResponse("zika", total, 2016);
+        // Only return latestYear when data is actually loaded — prevents "Latest data: 2016"
+        // appearing on the dashboard when the Zika ETL has not been run yet.
+        Integer latestYear = total > 0 ? 2016 : null;
+        return new DashboardStatsResponse.DiseaseTotalResponse("zika", total, latestYear);
     }
 
     private DashboardStatsResponse.DiseaseTotalResponse buildChikungunyaTotal() {

@@ -58,9 +58,11 @@ public class SecurityConfig {
                     "/api/dashboard/**",
                     "/api/ml/predictions/**"
                 ).permitAll()
+                // ── ML prediction — public (research demo, not clinical) ──
+                .requestMatchers(HttpMethod.POST, "/api/ml/run/dengue").permitAll()
                 // ── Health check — public ────────────────────────────────
                 .requestMatchers("/actuator/health", "/actuator/info").permitAll()
-                // ── ETL trigger + ML run — requires JWT ──────────────────
+                // ── ETL triggers + admin — requires JWT ──────────────────
                 .requestMatchers("/api/admin/**", "/api/ml/run/**", "/api/etl/**")
                     .authenticated()
                 // Everything else defaults to authenticated
