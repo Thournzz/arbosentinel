@@ -39,6 +39,7 @@ public class CacheConfig {
     public static final String DASHBOARD_STATS   = "dashboardStats";
     public static final String PHARMACOLOGY      = "pharmacology";
     public static final String VECTORS           = "vectors";
+    public static final String PAHO_CARIBBEAN   = "pahoCaribbean";   // PAHO Caribbean surveillance data
 
     @Bean
     public CacheManager cacheManager() {
@@ -46,7 +47,7 @@ public class CacheConfig {
             DISEASES, DISEASE_DETAIL, DENGUE_ANNUAL, DENGUE_SEASONAL,
             MALARIA_BURDEN, MALARIA_REGION, WEST_NILE_TREND,
             ZIKA_LOCATIONS, SINAN_COUNTS, RISK_SCORES, PROG_ALERTS,
-            DASHBOARD_STATS, PHARMACOLOGY, VECTORS
+            DASHBOARD_STATS, PHARMACOLOGY, VECTORS, PAHO_CARIBBEAN
         );
         manager.setCaffeine(Caffeine.newBuilder()
             .maximumSize(500)
