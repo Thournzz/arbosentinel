@@ -33,7 +33,6 @@ public class CacheConfig {
     public static final String MALARIA_REGION    = "malariaRegion";
     public static final String WEST_NILE_TREND   = "westNileTrend";
     public static final String ZIKA_LOCATIONS    = "zikaLocations";
-    public static final String SINAN_COUNTS      = "sinanCounts";
     public static final String RISK_SCORES       = "riskScores";
     public static final String PROG_ALERTS       = "progAlerts";
     public static final String DASHBOARD_STATS   = "dashboardStats";
@@ -46,7 +45,7 @@ public class CacheConfig {
         CaffeineCacheManager manager = new CaffeineCacheManager(
             DISEASES, DISEASE_DETAIL, DENGUE_ANNUAL, DENGUE_SEASONAL,
             MALARIA_BURDEN, MALARIA_REGION, WEST_NILE_TREND,
-            ZIKA_LOCATIONS, SINAN_COUNTS, RISK_SCORES, PROG_ALERTS,
+            ZIKA_LOCATIONS, RISK_SCORES, PROG_ALERTS,
             DASHBOARD_STATS, PHARMACOLOGY, VECTORS, PAHO_CARIBBEAN
         );
         manager.setCaffeine(Caffeine.newBuilder()

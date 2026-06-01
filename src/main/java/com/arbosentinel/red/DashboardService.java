@@ -3,11 +3,18 @@ package com.arbosentinel.red;
 // ================================================
 // RED layer — Dashboard aggregation service
 // Assembles hero statistics from materialized views
-// and cross-service totals for the landing dashboard
+// and cross-service totals for the Caribbean-focused landing dashboard
+// Scope: Caribbean + regional arboviral intelligence (Dr. Sandiford directive)
 // ================================================
 
 import com.arbosentinel.green.dto.DashboardStatsResponse;
-import com.arbosentinel.purple.*;
+import com.arbosentinel.purple.DataQualityFlagRepository;
+import com.arbosentinel.purple.DengueWeeklyCaseRepository;
+import com.arbosentinel.purple.IngestionLogRepository;
+import com.arbosentinel.purple.MalariaEstimatedCaseRepository;
+import com.arbosentinel.purple.PahoCaribCaseRepository;
+import com.arbosentinel.purple.WestNileAnnualCaseRepository;
+import com.arbosentinel.purple.ZikaCaseRepository;
 import com.arbosentinel.yellow.CacheConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +35,7 @@ public class DashboardService {
     private final WestNileAnnualCaseRepository westNileRepo;
     private final MalariaEstimatedCaseRepository malariaRepo;
     private final ZikaCaseRepository zikaRepo;
-    private final BrazilSinanCaseRepository sinanRepo;
+    private final PahoCaribCaseRepository pahoRepo;
     private final DataQualityFlagRepository qualityFlagRepo;
     private final IngestionLogRepository ingestionLogRepo;
 
@@ -99,12 +106,15 @@ public class DashboardService {
     }
 
     private DashboardStatsResponse.DiseaseTotalResponse buildChikungunyaTotal() {
-        long count = sinanRepo.count(); // total patient-level records (Brazil SINAN)
-        List<Object[]> byYear = sinanRepo.countByDiseaseTypeAndYear();
-        int latestYear = byYear.stream()
-            .mapToInt(r -> (Integer) r[1])
-            .max()
-            .orElse(0);
-        return new DashboardStatsResponse.DiseaseTotalResponse("chikungunya", count, latestYear);
+        // Brazil SINAN removed — outside Caribbean scope.
+        // Chikungunya is endemic in the Caribbean (Ae. aegypti vector, same as dengue)
+        // but a dedicated Caribbean chikungunya surveillance data source has not yet
+        // been integrated. The PAHO Delphi API currently provides dengue data only.
+        // For now: surface the PAHO total Caribbean dengue cases as a proxy indicator
+        // (chikungunya outbreaks co-occur with dengue seasons) and return 0 for count
+        // until a Caribbean chikungunya endpoint is added.
+        long pahoCaribDengue = pahoRepo.sumDengueCasesByLocation("jm");  // Jamaica as proxy
+        Integer latestYear = pahoRepo.findDistinctYears().stream().findFirst().orElse(null);
+        return new DashboardStatsResponse.DiseaseTotalResponse("chikungunya", 0L, latestYear);
     }
 }

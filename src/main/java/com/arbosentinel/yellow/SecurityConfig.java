@@ -51,7 +51,7 @@ public class SecurityConfig {
                     "/api/malaria/**",
                     "/api/westnile/**",
                     "/api/zika/**",
-                    "/api/sinan/**",
+                    "/api/paho/**",
                     "/api/pharmacology/**",
                     "/api/alerts/**",
                     "/api/risk/**",

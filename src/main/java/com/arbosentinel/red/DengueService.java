@@ -3,7 +3,9 @@ package com.arbosentinel.red;
 // ================================================
 // RED layer — Dengue business logic
 // Powers: Surveillance dashboard (dengue section)
-// Data sources: DengAI — San Juan (sj) + Iquitos (iq)
+// Data source: DengAI — San Juan, Puerto Rico ('sj') only
+//              Iquitos, Peru ('iq') removed — outside Caribbean scope
+// Primary Caribbean surveillance: PAHO data via PahoService
 // Key features: annual trend, seasonal peaks, climate correlation
 // ================================================
 
@@ -34,7 +36,9 @@ public class DengueService {
     private final DengueWeeklyCaseRepository dengueRepo;
     private final DengueMapper dengueMapper;
 
-    private static final List<String> VALID_CITIES = List.of("sj", "iq");
+    // 'sj' = San Juan, Puerto Rico — the only DengAI city in the Caribbean
+    // 'iq' (Iquitos, Peru) removed — South America, outside Caribbean scope
+    private static final List<String> VALID_CITIES = List.of("sj");
 
     // ── Annual summary (chart data) ──────────────────────────────
 
@@ -112,7 +116,7 @@ public class DengueService {
     private void validateCity(String city) {
         if (!VALID_CITIES.contains(city.toLowerCase())) {
             throw new IllegalArgumentException(
-                "Invalid city code '" + city + "'. Valid: 'sj' (San Juan), 'iq' (Iquitos)");
+                "Invalid city code '" + city + "'. Valid: 'sj' (San Juan, Puerto Rico)");
         }
     }
 }

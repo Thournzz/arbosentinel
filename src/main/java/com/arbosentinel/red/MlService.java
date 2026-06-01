@@ -154,9 +154,9 @@ public class MlService {
     // ── Helpers ──────────────────────────────────────────────────
 
     private String cityToRegion(String city) {
+        // Only San Juan, Puerto Rico remains — Iquitos (Peru) removed, outside Caribbean scope
         return switch (city.toLowerCase()) {
             case "sj" -> "San Juan, Puerto Rico";
-            case "iq" -> "Iquitos, Peru";
             default   -> city;
         };
     }
